@@ -7,6 +7,7 @@ def search(words, wordLength, excludedLetters, includedLetters, includedLettersW
             
         word = word.lower()
         
+        tempIncludedPool = []
         viable = True
         for letter in excludedLetters:
             try:
@@ -19,17 +20,8 @@ def search(words, wordLength, excludedLetters, includedLetters, includedLettersW
         if not viable: 
             continue
             
-        for letter in includedLetters:
-            try:
-                word.index(letter)
-            except ValueError:
-                viable = False
-                break
-                
-        if not viable:
-            continue
-    
         for key in includedLettersWithExcludedPositions:
+            #tempIncludedPool.append(key)
             for pos in includedLettersWithExcludedPositions[key]:
                 if word[pos] == key:
                     viable = False
@@ -47,11 +39,22 @@ def search(words, wordLength, excludedLetters, includedLetters, includedLettersW
             continue
         
         for key in includedLettersWithIncludedPositions:
+            #tempIncludedPool.append(key)
             for pos in includedLettersWithIncludedPositions[key]:
                 if word[pos] != key:
                     viable = False
                     break
             if not viable:
+                break
+            
+        if not viable:
+            continue
+           
+        for letter in includedLetters:
+            try:
+                word.index(letter)
+            except ValueError:
+                viable = False
                 break
             
         if not viable:
@@ -113,14 +116,12 @@ def main():
             for letter in excludedLetters:
                 if len(letter) > 1:
                     print(f"Excluded letters incorrectly specified for letter {letter} (Seems like its more than one letter). Please try again\n")
-                    continue
+                    break
                 
                 if letter.lower() < 'a' or letter.lower() > 'z':
                     print(f"Excluded letters incorrectly specified for letter {letter} (Seems like theres a non-letter included). Please try again\n")
-                    continue
-                    
-            break
-            
+                    break
+                       
         if exit:
             break
         
@@ -202,8 +203,35 @@ def main():
             break
             
         while True:
-            choice = input("(optional) Please enter any letters to include in search results with unspecified locations\nNote that because you can provide included letters at set positions, those set positions will take precedence over\nvalues provided here.\nThat is, included positions override unspecified ones, but there will be no error, it just won't include the letter in the
-            
+            choice = input("(optional) Please enter any letters to include in search results with unspecified locations.\nLetters duplicated from the excluded letters list and the included letters list which has explicitly excluded positions are not allowed.\n")
+            if choice == "exit":
+                exit = True
+                break
+                
+            if len(choice) == 0:
+                break
+   
+            includedLetters = choice.split()
+            for letter in includedLetters:
+                if len(letter) > 1:
+                    print(f"Included letters incorrectly specified for letter {letter} (Seems like its more than one letter). Please try again\n")
+                    break
+                
+                if letter.lower() < 'a' or letter.lower() > 'z':
+                    print(f"Included letters incorrectly specified for letter {letter} (Seems like theres a non-letter included). Please try again\n")
+                    break
+                    
+                if letter in excludedLetters:
+                    print(f"Included letter found in excluded list. Please remove it or exit to restart the search process.\n") 
+                    break
+                    
+                if letter in includedLettersWithExcludedPositions:
+                    print(f"Included letter found in included list with excluded positions. Please remove it or exit to restart the search process.\n")
+                    break
+
+        if exit:
+            break
+        
         result = search(words, wordLength, excludedLetters, includedLetters, includedLettersWithExcludedPositions, includedLettersWithIncludedPositions)
         print(f"The results of your search will follow. There are {len(result)} words of length {wordLength} and the other provided search options.\n")
         choice = input("Enter just the letter x (non case-sensitive) to view the rest of the search parameters.\nAny other input, excluding the exit command, will reveal the results without reviewing those parameters.\n")
