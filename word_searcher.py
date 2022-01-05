@@ -105,23 +105,36 @@ def main():
         exit = False
         while True:
             choice = input("(optional) Please enter any letters to exclude from search results, separated by a space.\n")
+            
             if choice == "exit": 
                 exit = True
                 break
                 
             if len(choice) == 0:
                 break
-             
+            
+            #print(choice)
+            
             excludedLetters = choice.split()
+            #print(excludedLetters)
+            
+            cont = False
             for letter in excludedLetters:
                 if len(letter) > 1:
                     print(f"Excluded letters incorrectly specified for letter {letter} (Seems like its more than one letter). Please try again\n")
+                    cont = True
                     break
                 
                 if letter.lower() < 'a' or letter.lower() > 'z':
                     print(f"Excluded letters incorrectly specified for letter {letter} (Seems like theres a non-letter included). Please try again\n")
+                    cont = True
                     break
-                       
+            
+            if cont: 
+                continue
+            
+            break
+            
         if exit:
             break
         
@@ -136,12 +149,14 @@ def main():
             
             chunks = choice.split()
             cdex = 0
+            cont = False
             for chunk in chunks:
                 separatedChunk = chunk.split(',')
                 letter = separatedChunk[0].lower()
                 if len(separatedChunk[0]) != 1 or letter < 'a' or letter > 'z':
                     print(f"Chunk index {cdex} contains a non-letter in the 0th index. Please reformat and try again.\n")
-                    continue
+                    cont = True
+                    break
                     
                 positions = []
                 for dex in range(1, len(separatedChunk)):
@@ -151,15 +166,23 @@ def main():
                         posint = int(pos)
                     except ValueError:
                         print(f"Chunk index {cdex} contains a non integer position value at subindex {dex}\n(or {dex+1} if you count the letter at the beginning of the chunk)\nPlease reformat and try again.\n")
-                        continue
+                        cont = True
+                        break
                     if posint < 0 or (wordLength > 0 and posint >= wordLength):
                         print(f"Chunk index {cdex} contains a negative integer position value or one which exceeds the provided wordLength at subindex {dex}\n(or {dex+1} if you count the letter at the beginning of the chunk)\nPlease reformat and try again.\n")
-                        continue
+                        cont = True
+                        break
                     else:
                         positions.append(posint)
-                  
+                if cont:
+                    break
+                    
                 includedLettersWithIncludedPositions[letter]=positions
                 cdex += 1  
+            if cont:
+                continue
+            break
+            
         if exit:
             break
             
@@ -174,6 +197,7 @@ def main():
             
             chunks = choice.split()
             cdex = 0
+            cont = False
             for chunk in chunks:
                 separatedChunk = chunk.split(',')
                 letter = separatedChunk[0].lower()
@@ -189,15 +213,21 @@ def main():
                         posint = int(pos)
                     except ValueError:
                         print(f"Chunk index {cdex} contains a non integer position value at subindex {dex}\n(or {dex+1} if you count the letter at the beginning of the chunk)\nPlease reformat and try again.\n")
-                        continue
+                        cont = True
+                        break
                     if posint < 0 or (wordLength > 0 and posint >= wordLength):
                         print(f"Chunk index {cdex} contains a negative integer position value or one which exceeds the provided wordLength at subindex {dex}\n(or {dex+1} if you count the letter at the beginning of the chunk)\nPlease reformat and try again.\n")
-                        continue
+                        cont = True
+                        break
                     else:
                         positions.append(posint)
-                  
-                includedLettersWithIncludedPositions[letter]=positions
-                cdex += 1  
+                if cont:
+                    break
+                includedLettersWithExcludedPositions[letter]=positions
+                cdex += 1 
+            if cont:
+                continue
+            break
                 
         if exit:
             break
@@ -212,23 +242,32 @@ def main():
                 break
    
             includedLetters = choice.split()
+            cont = False
             for letter in includedLetters:
                 if len(letter) > 1:
                     print(f"Included letters incorrectly specified for letter {letter} (Seems like its more than one letter). Please try again\n")
+                    cont = True
                     break
                 
                 if letter.lower() < 'a' or letter.lower() > 'z':
                     print(f"Included letters incorrectly specified for letter {letter} (Seems like theres a non-letter included). Please try again\n")
+                    cont = True
                     break
                     
                 if letter in excludedLetters:
                     print(f"Included letter found in excluded list. Please remove it or exit to restart the search process.\n") 
+                    cont = True
                     break
                     
                 if letter in includedLettersWithExcludedPositions:
                     print(f"Included letter found in included list with excluded positions. Please remove it or exit to restart the search process.\n")
+                    cont = True
                     break
-
+            if cont:
+                continue
+                
+            break
+            
         if exit:
             break
         
